@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-//using System;
 
 [System.Serializable]
 public class SpellSlot
@@ -110,45 +109,13 @@ public class SpellMaster : MonoBehaviour
         if (pointerSpell == true)
 
         {
-            //if (Input.touchCount > 0)
+            
 
             Touch touch = Input.GetTouch(touchNumber);
             pointer.position = touch.position;
 
-
-            //if (Input.touchCount == 1)
-            //{
-            //    Touch touch = Input.GetTouch(0);
-            //    pointer.position = touch.position;
-            //}
-            //if (Input.touchCount == 2)
-            //{
-            //    Touch touch = Input.GetTouch(1);
-            //    pointer.position = touch.position;
-            //}
-
-            //////////////////////////
-
-
-            //Vector2 pos = Input.mousePosition;
-            //pointer.position = pos;
         }
 
-
-        /////////////////////////
-
-
-        //if (Input.touchCount > 0)
-        //{
-        //    Touch touch = Input.GetTouch(0);
-
-        //    // Update the Text on the screen depending on current position of the touch each frame
-        //    m_Text.text = "Touch Position : " + touch.position;
-        //}
-        //else
-        //{
-        //    m_Text.text = "No touch contacts";
-        //}
 
     }
 
@@ -183,24 +150,11 @@ public class SpellMaster : MonoBehaviour
 
     public Spell GetItem(int i) { return i < spells.Count ? spells[i].spell : null; }
 
-    //public int GetAmount(int i) { return i < items.Count ? items[i].amount : 0; }
+    
 
     public int GetSize() { return spells.Count;  }
 
-    //public void EverySec()
-    //{
-    //    for (int i = 0; i < 199; i++)
-    //    {
-    //        if (cdList[i] > 0) cdList[i] -= 1f;
-    //    }
-    //    for (int i = 0; i < 8; i++)
-    //    {
-    //        if (cdFloat[i] >= 1) { cdFloat[i] -= 1f; cdText[i].text = "" + cdFloat[i]; cdImage[i].GetComponent<Image>().color = new Color(0f, 0f, 0f, 0.5f); }
-    //        if (cdFloat[i] == 0) { cdText[i].text = ""; cdImage[i].GetComponent<Image>().color = new Color(0f, 0f, 0f, 0.0f); }
-    //    }
-    //    //if (cdFloat[0] > 0) cdFloat[0] -= 1f; cdText[0].text = "" + cdFloat[0];
-    //    //icons[i].GetComponent<Image>().color = new Color(1f, 1f, 1f, 1f);
-    //}
+   
 
     public void ButtonDown(int number)
 
@@ -216,7 +170,7 @@ public class SpellMaster : MonoBehaviour
                 if (Input.touchCount == 2) touchNumber = 1;
                 if (Input.touchCount == 3) touchNumber = 2;
             }
-            Debug.Log("BUTTON DOWNNNN 2222222");
+           
         }
     }
 
@@ -228,15 +182,9 @@ public class SpellMaster : MonoBehaviour
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit, 100))
             {
-                //Debug.DrawLine(ray.origin, hit.point);
-                // Debug.Log(hit.point);
+                
                 pointerTarget = hit.point;
             }
-
-            Debug.Log("BUTTON UPPPPPP 2222222");
-
-
-
             pointerSpell = false;
 
             pointer.localScale = new Vector3(0, 0);
@@ -248,352 +196,11 @@ public class SpellMaster : MonoBehaviour
     }
 
 
-    //public void SpellButton00() { if (cdList[spells[0].spell.id] <= 0 && playerstat.states[1] <= 0 && playerstat.curMP >= spells[0].spell.mana) { cdFloat[0] = spells[0].spell.cooldown; CastSpell(spells[0].level, spells[0].spell); } }
-    //public void SpellButton01() { if (cdList[spells[1].spell.id] <= 0 && playerstat.states[1] <= 0 && playerstat.curMP >= spells[1].spell.mana) { cdFloat[1] = spells[1].spell.cooldown; CastSpell(spells[1].level, spells[1].spell); } }
-    //public void SpellButton02() { if (cdList[spells[2].spell.id] <= 0 && playerstat.states[1] <= 0 && playerstat.curMP >= spells[2].spell.mana) { cdFloat[2] = spells[2].spell.cooldown; CastSpell(spells[2].level, spells[2].spell); } }
-    //public void SpellButton03() { if (cdList[spells[3].spell.id] <= 0 && playerstat.states[1] <= 0 && playerstat.curMP >= spells[3].spell.mana) { cdFloat[3] = spells[3].spell.cooldown; CastSpell(spells[3].level, spells[3].spell); } }
-    //public void SpellButton04() { if (cdList[spells[4].spell.id] <= 0 && playerstat.states[1] <= 0 && playerstat.curMP >= spells[4].spell.mana) { cdFloat[4] = spells[4].spell.cooldown; CastSpell(spells[4].level, spells[4].spell); } }
-
-    //public void SpellButton05() { if (cdList[spells[5].spell.id] <= 0 && playerstat.states[1] <= 0 && playerstat.curMP >= spells[5].spell.mana) { cdFloat[5] = spells[5].spell.cooldown; CastSpell(spells[5].level, spells[5].spell); } }
-    //public void SpellButton06() { if (cdList[spells[6].spell.id] <= 0 && playerstat.states[1] <= 0 && playerstat.curMP >= spells[6].spell.mana) { cdFloat[6] = spells[6].spell.cooldown; CastSpell(spells[6].level, spells[6].spell); } }
-    //public void SpellButton07() { if (cdList[spells[7].spell.id] <= 0 && playerstat.states[1] <= 0 && playerstat.curMP >= spells[7].spell.mana) { cdFloat[7] = spells[7].spell.cooldown; CastSpell(spells[7].level, spells[7].spell); } }
-
+   
     private void CastSpell(int level, Spell spell)
 
     {
         passiveMaster.CastSpellEvent();
-
-        ////thunder strike 00
-        //if (spell.id == 0)
-        //{
-        //    playerstat.ReduceMana(spell.mana);
-        //    cdList[spell.id] = spell.cooldown;
-
-        //    //Instantiate(masterEffect.effects[0], transform.position + Vector3.up * 0.5f, transform.rotation); // change effect root
-        //    anim.SetTrigger("Stomp");
-
-        //    int damage = 0;
-
-        //    if (spell.isDamaging == true)
-        //    {
-        //        for (int i = 0; i < 50; i++)
-        //        {
-        //            if (spell.feature[i] > 0)
-        //            {
-        //                if (level == 1) damage += (spell.feature[i] * playerstat.stats.stats[200 + i]) / 100;
-        //                if (level > 1) damage += (spell.feature[i] + (spell.forLevelFeature[i] * (level - 1)) * playerstat.stats.stats[200 + i]) / 100;
-
-
-        //            }
-        //        }
-        //    }
-
-
-
-
-
-        //    Collider[] _col = Physics.OverlapSphere(transform.position, 3);
-        //    foreach (var col in _col)
-        //    {
-        //        if (col.gameObject.tag == "Enemy")
-        //        {
-        //            UnitController unitController = col.GetComponent<UnitController>();
-        //            unitController.MakeDamage(damage, 0, 0, 0);
-        //            if (spell.buff) unitController.AddBuff(spell.buff, level);
-        //        }
-
-        //    }
-        //}
-        ////thrust 01
-        //if (spell.id == 1)
-        //{
-
-        //    playerstat.ReduceMana(spell.mana);
-        //    cdList[spell.id] = spell.cooldown;
-        //    Collider[] _col = Physics.OverlapSphere(transform.TransformPoint(Vector3.forward * 2), 3f);
-
-        //    //Instantiate(masterEffect.effects[0], transform.TransformPoint(Vector3.forward * 2), transform.rotation);
-        //    //Debug.Log("I CAST THE THRUST!!!!!! player");
-        //    anim.SetTrigger("Stomp");
-        //    foreach (var col in _col)
-        //    {
-        //        if (col.gameObject.tag == "Enemy")
-        //        {
-        //            UnitController unitController = col.GetComponent<UnitController>();
-        //            unitController.TakeThrust(1);
-        //            // col.gameObject.SendMessage("TakeThrust", 1, SendMessageOptions.DontRequireReceiver);
-        //        }
-
-
-        //    }
-        //}
-        //// immolation
-        //if (spell.id == 2)
-        //{
-        //    anim.SetTrigger("HandUp");
-        //    playerstat.ReduceMana(spell.mana);
-        //    cdList[spell.id] = spell.cooldown;
-
-        //    if (spell.isDamaging == true)
-        //    {
-        //        int damage = 0;
-
-        //        for (int i = 0; i < 50; i++)
-        //        {
-        //            if (spell.feature[i] > 0) { damage += (spell.feature[i] * playerstat.stats.stats[200 + i]) / 100; }
-        //        }
-        //        Debug.Log("Damage immolation = " + damage);
-        //    }
-
-        //    playerstat.AddBuff(spell.buff, level);
-        //}
-        //// small heal 03
-        //if (spell.id == 3 && cdList[spell.id] <= 0 && playerstat.curMP >= spell.mana)
-        //{
-        //    playerstat.ReduceMana(spell.mana);
-        //    cdList[spell.id] = spell.cooldown;
-        //    float heal = 100f;
-        //    playerstat.DealHeal(heal);
-        //    anim.SetTrigger("HandUp");
-        //}
-        ////rage 04
-        //if (spell.id == 4 && cdList[spell.id] <= 0 && playerstat.curMP >= spell.mana)
-        //{
-        //    playerstat.ReduceMana(spell.mana);
-        //    cdList[spell.id] = spell.cooldown;
-
-        //    playerstat.AddBuff(spell.buff, level);
-        //    anim.SetTrigger("HandUp");
-
-        //}
-        ////divine shield 05
-        //if (spell.id == 5 && cdList[spell.id] <= 0 && playerstat.curMP >= spell.mana)
-        //{
-        //    playerstat.ReduceMana(spell.mana);
-        //    cdList[spell.id] = spell.cooldown;
-
-        //    playerstat.AddBuff(spell.buff, level);
-        //    anim.SetTrigger("Roar");
-
-        //}
-        //if (spell.id == 6 && cdList[spell.id] <= 0 && playerstat.curMP >= spell.mana)
-        //{
-        //    playerstat.ReduceMana(spell.mana);
-        //    cdList[spell.id] = spell.cooldown;
-
-        //    playerstat.AddBuff(spell.buff, level);
-        //    anim.SetTrigger("HandUp");
-
-        //}
-        //if (spell.id == 7 && cdList[spell.id] <= 0 && playerstat.curMP >= spell.mana)
-        //{
-        //    playerstat.ReduceMana(spell.mana);
-        //    cdList[spell.id] = spell.cooldown;
-
-        //    playerstat.AddBuff(spell.buff, level);
-        //    anim.SetTrigger("HandUp");
-
-        //}
-        //if (spell.id == 8 && cdList[spell.id] <= 0 && playerstat.curMP >= spell.mana)
-        //{
-        //    playerstat.ReduceMana(spell.mana);
-        //    cdList[spell.id] = spell.cooldown;
-
-        //    playerstat.AddBuff(spell.buff, level);
-        //    anim.SetTrigger("Roar");
-
-        //}
-        //// frost arrow
-        //if (spell.id == 9 && cdList[spell.id] <= 0 && playerstat.curMP >= spell.mana)
-        //{
-        //    playerstat.ReduceMana(spell.mana);
-        //    cdList[spell.id] = spell.cooldown;
-
-
-        //    anim.SetTrigger("Cast00");
-
-        //    GameObject newBullet;
-
-        //    newBullet = Instantiate(spell.bullet);
-
-        //    newBullet.transform.rotation = transform.rotation;
-        //    newBullet.transform.position = transform.TransformPoint(Vector3.up * 1f);
-
-        //    Bullet bulletController = newBullet.GetComponent<Bullet>();
-        //    bulletController.ally = true;
-        //    bulletController.speed = 10f;
-        //    bulletController.damage = playerstat.stats.stats[224] * 2;
-        //    bulletController.dest = transform.forward;
-        //}
-
-        ////thunder strike 10
-        //if (spell.id == 10)
-        //{
-        //    playerstat.ReduceMana(spell.mana);
-        //    cdList[spell.id] = spell.cooldown;
-
-        //    Instantiate(spell.effect, transform.position + Vector3.up * 0.9f, transform.rotation); // change effect root
-        //    anim.SetTrigger("Roar");
-
-        //    int damage = 0;
-
-        //    if (spell.isDamaging == true)
-        //    {
-        //        for (int i = 0; i < 50; i++)
-        //        {
-        //            if (spell.feature[i] > 0)
-        //            {
-        //                if (level == 1) damage += (spell.feature[i] * playerstat.stats.stats[200 + i]) / 100;
-        //                if (level > 1) damage += (spell.feature[i] + (spell.forLevelFeature[i] * (level - 1)) * playerstat.stats.stats[200 + i]) / 100;
-
-
-        //            }
-        //        }
-        //    }
-
-
-
-
-
-        //    Collider[] _col = Physics.OverlapSphere(transform.position, 3);
-        //    foreach (var col in _col)
-        //    {
-        //        if (col.gameObject.tag == "Enemy")
-        //        {
-        //            UnitController unitController = col.GetComponent<UnitController>();
-        //            unitController.MakeDamage(damage, 0, 0, 0);
-        //            if (spell.buff) unitController.AddBuff(spell.buff, level);
-        //            if (spell.effectTarget) Instantiate(spell.effectTarget, col.transform.position + Vector3.up * 0.5f, transform.rotation);
-        //        }
-
-        //    }
-        //}
-        //// arcane  arrows 11
-        //if (spell.id == 11 && cdList[spell.id] <= 0 && playerstat.curMP >= spell.mana)
-        //{
-        //    playerstat.ReduceMana(spell.mana);
-        //    cdList[spell.id] = spell.cooldown;
-
-
-        //    anim.SetTrigger("Cast00");
-
-        //    for (int i = 0; i < 10; i++)
-        //    {
-
-        //        GameObject newBullet;
-
-        //        newBullet = Instantiate(spell.bullet);
-
-        //        newBullet.transform.rotation = transform.rotation;
-        //        //newBullet.transform.position = transform.TransformPoint(Vector3.forward * i);
-        //        newBullet.transform.position = transform.TransformPoint(Vector3.forward * 2);
-
-        //        Bullet bulletController = newBullet.GetComponent<Bullet>();
-        //        Animator bulletAnim = newBullet.GetComponent<Animator>();
-        //        bulletController.ally = true;
-        //        bulletController.speed = 7f;
-        //        bulletController.damage = playerstat.stats.stats[224];
-        //        bulletController.dest = transform.forward;
-        //        bulletController.wait = true;
-        //        bulletController.Wait(0.05f * i);
-
-        //        int rand = Random.Range(1, 11);
-        //        Debug.Log(rand);
-        //        bulletAnim.SetInteger("animation", rand);
-        //        //bulletAnim.SetInteger("animation", 3);
-        //        //bulletAnim.SetInteger("animation", 33);
-        //    }
-        //}
-
-        //// arcane  bolt
-        //if (spell.id == 12 && cdList[spell.id] <= 0 && playerstat.curMP >= spell.mana)
-        //{
-        //    playerstat.ReduceMana(spell.mana);
-        //    cdList[spell.id] = spell.cooldown;
-
-
-        //    anim.SetTrigger("Cast00");
-
-        //    GameObject newBullet;
-
-        //    newBullet = Instantiate(spell.bullet);
-
-        //    newBullet.transform.rotation = transform.rotation;
-        //    newBullet.transform.position = transform.TransformPoint(Vector3.up * 1f);
-
-        //    Bullet bulletController = newBullet.GetComponent<Bullet>();
-        //    bulletController.ally = true;
-        //    bulletController.speed = 10f;
-        //    bulletController.damage = playerstat.stats.stats[224] * 7;
-        //    bulletController.dest = transform.forward;
-        //}
-
-
-
-        //// FIRE  bolt
-        //if (spell.id == 13 && cdList[spell.id] <= 0 && playerstat.curMP >= spell.mana)
-        //{
-        //    playerstat.ReduceMana(spell.mana);
-        //    cdList[spell.id] = spell.cooldown;
-
-
-        //    anim.SetTrigger("Cast00");
-
-        //    GameObject newBullet;
-
-        //    newBullet = Instantiate(spell.bullet);
-
-        //    newBullet.transform.rotation = transform.rotation;
-        //    newBullet.transform.position = transform.TransformPoint(Vector3.up * 1f);
-
-        //    Bullet bulletController = newBullet.GetComponent<Bullet>();
-        //    bulletController.ally = true;
-        //    bulletController.speed = 10f;
-        //    bulletController.damage = playerstat.stats.stats[224] * 7;
-        //    bulletController.dest = transform.forward;
-        //}
-
-        //// Arcane  Explode
-        //if (spell.id == 14 && cdList[spell.id] <= 0 && playerstat.curMP >= spell.mana)
-        //{
-        //    playerstat.ReduceMana(spell.mana);
-        //    cdList[spell.id] = spell.cooldown;
-
-
-        //    anim.SetTrigger("Cast00");
-
-        //    Instantiate(spell.effect, pointerTarget + Vector3.up * 2f, transform.rotation); // change effect root
-
-        //    Collider[] _col = Physics.OverlapSphere(pointerTarget, 3);
-        //    foreach (var col in _col)
-        //    {
-        //        if (col.gameObject.tag == "Enemy")
-        //        {
-        //            UnitController unitController = col.GetComponent<UnitController>();
-        //            unitController.MakeDamage(50, 0, 0, 0);
-        //            if (spell.buff) unitController.AddBuff(spell.buff, level);
-        //        }
-
-        //    }
-        //}
-
-
-
-
-
-        //// shield block
-        //if (spell.id == 12434552)
-        //{
-        //    playerstat.ReduceMana(spell.mana);
-        //    cdList[spell.id] = spell.cooldown;
-
-        //    playerstat.AddBuff(spell.buff, level);
-        //    anim.SetTrigger(spell.animTrigger);
-
-        //}
-
-
-
 
         if (spell.id >= 0 && spell.id < 299)
         {
@@ -841,26 +448,7 @@ public class SpellMaster : MonoBehaviour
             }
         }
 
-        //if (spell.id == 105) // thrust
-        //{
-
-        //    Collider[] _col = Physics.OverlapSphere(transform.TransformPoint(Vector3.forward * 2f), 5f);
-        //    Debug.Log("Spell THRUUUUUSTTT");
-
-        //    foreach (var col in _col)
-        //    {
-        //        if (col.gameObject.tag == "Enemy")
-        //        {
-        //            UnitController unitController = col.GetComponent<UnitController>();
-        //            unitController.player = gameObject;
-        //            unitController.TakeThrust(1);
-        //            //unitController.AddBuff(spell.buff, level, 0);
-        //        }
-
-
-
-        //    }
-        //}
+       
 
     }
             IEnumerator DelayColliderDamageEffect(float delay, float radius, float forward, int damage, int damageBuff, Buff buff, GameObject effect, int level)
