@@ -150,7 +150,7 @@ public class PlayerController : MonoBehaviour
             anim.SetBool("Run", false);
             anim.ResetTrigger("Idle");
             nav.enabled = false;
-            GameObject.Find("Structure").GetComponent<Game>().ZombieAttack();
+            game.ZombieAttack();
         }
     }
 }
