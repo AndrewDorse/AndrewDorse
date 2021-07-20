@@ -9,16 +9,7 @@ public class Game : MonoBehaviour
     public List<GameObject> mobList = new List<GameObject>();
     public GameObject player;
 
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+   
 
     public void ZombieAttack()
     {
