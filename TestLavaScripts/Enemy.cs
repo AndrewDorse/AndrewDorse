@@ -115,16 +115,13 @@ public class Enemy : MonoBehaviour
         {
             if (sourceTransform.tag != "UI")
             {
-                // Debug.Log("success   " + sourceTransform.gameObject.name);
                 var source = sourceTransform.GetChild(i);
-
                 var destination = destinationTransform.GetChild(i);
                 destination.position = source.position;
                 destination.rotation = source.rotation;
                 var rb = destination.GetComponent<Rigidbody>();
                 if (rb != null)  rb.AddForce(deathDirection, ForceMode.Impulse);
-
-
+                
                 CopyTransformData(source, destination);
             }
 
