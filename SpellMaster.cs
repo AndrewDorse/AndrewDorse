@@ -26,15 +26,10 @@ public class SpellMaster : MonoBehaviour
 {
 
     [SerializeField] private int size = 8;
-
     [SerializeField] public UnityEvent OnSpellsChanged;
-    
-
     [SerializeField] public List<SpellSlot> spells = new List<SpellSlot>();
-
-    public int targetSpell;
-
-    public Text descriptionSpellGameMenu;
+    [SerializeField] public int targetSpell;
+    [SerializeField] public Text descriptionSpellGameMenu;
 
     PlayerController playerController;
     playerstat playerstat;
@@ -44,15 +39,12 @@ public class SpellMaster : MonoBehaviour
     
 
     public LineRenderer LineRend1;
-
     public Material materialLineRenderer;
     public RectTransform pointer;
     bool pointerSpell;
     Vector3 pointerTarget;
     int touchNumber;
-
-
-    //[SerializeField] private List<Image> buffsIcons = new List<Image>();
+    
     [SerializeField] private float[] cdList = new float[200];
     [SerializeField] private Text[] cdText = new Text[10];
     [SerializeField] private float[] cdFloat = new float[10];
@@ -70,7 +62,7 @@ public class SpellMaster : MonoBehaviour
         }
 
 
-        //LineRend1 = gameObject.AddComponent<LineRenderer>();
+      
         LineRend1 = GetComponent<LineRenderer>();
         LineRend1.enabled = false;
     }
