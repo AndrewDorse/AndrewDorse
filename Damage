@@ -82,9 +82,12 @@ namespace Photon.Pun.Darse.Tales
                     }
                     currentHP = currentHP - _currentDamage;
                     if (currentHP <= 0) { Death(); }
-                    if (combatUIInterface != null) combatUIInterface.CombatText((int)Mathf.Ceil(_currentDamage), _damageSlot.damageType);
-                    else Debug.LogError("combatUIInterface == null", this);
-                    if (combatUIInterface != null) combatUIInterface.SetPercentageHP(currentHP / stats.stats_list[0], currentHP);
+                    if (combatUIInterface != null)
+                    {
+                        combatUIInterface.CombatText((int)Mathf.Ceil(_currentDamage), _damageSlot.damageType);
+                        combatUIInterface.SetPercentageHP(currentHP / stats.stats_list[0], currentHP);
+                    }
+                    else Debug.LogError("combatUIInterface == null", this);                    
                 }
                 else
                 {
