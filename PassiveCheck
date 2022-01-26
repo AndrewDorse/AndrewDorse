@@ -1,0 +1,29 @@
+using System.Collections.Generic;
+using UnityEngine;
+
+public class PassiveCheck
+    {
+        public PassiveCheck() { }
+
+        public PassiveUse passiveUseComponent; 
+
+        public List<PassiveSlot> passives = new List<PassiveSlot>(); 
+
+        public void CheckPassive(TriggerPassives _trigger)
+        {
+            foreach (PassiveSlot _passiveSlot in passives)
+            {
+                if (_passiveSlot.passive.triggerPassiveState == _trigger)
+                {
+                    // check on chance to success
+                    int random = Random.Range(1, 100);
+                    if (random <= _passiveSlot.passive.chance)
+                    {
+                        passiveUseComponent.StartPassive(_passiveSlot);
+                    }
+                }
+            }
+        }
+
+
+    }
