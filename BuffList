@@ -1,0 +1,127 @@
+ using System.Collections.Generic;
+ using UnityEngine;
+ 
+ public class BuffList
+    {
+        public BuffList() { }
+        public BuffUse buffUseComponent;
+        public UIBuffsPanel uIBuffsPanelComponent;
+        public UIDebuffsPanel uIDebuffsPanelComponent;
+        public List<BuffSlot> buffs = new List<BuffSlot>();
+        public List<BuffSlot> debuffs = new List<BuffSlot>();
+        public void ClearDebuff(BuffSlot _debuff) 
+        { 
+            debuffs.Remove(_debuff); 
+            if(uIDebuffsPanelComponent) uIDebuffsPanelComponent.UpdateUI(); 
+        }
+
+        public void ClearBuff(BuffSlot _buff) 
+        {
+            buffs.Remove(_buff);
+            if (uIBuffsPanelComponent) uIBuffsPanelComponent.UpdateUI(); 
+        }
+
+        public void ReduceTime()
+        {
+            List<BuffSlot> _deleteBuffs = new List<BuffSlot>();
+            List<BuffSlot> _deleteDebuffs = new List<BuffSlot>();
+
+            foreach (BuffSlot _buff in buffs)
+            {
+                _buff.time -= 1;
+                if (_buff.time <= 0)
+                {
+                    _deleteBuffs.Add(_buff);
+                }
+
+            }
+            foreach (BuffSlot _debuff in debuffs)
+            {
+                _debuff.time -= 1;
+                if (_debuff.time <= 0)
+                {
+                    _deleteDebuffs.Add(_debuff);
+                }
+
+            }
+
+            foreach (BuffSlot _buff in _deleteBuffs)
+            {
+                buffUseComponent.UndoBuff(_buff);
+                ClearBuff(_buff);
+            }
+            foreach (BuffSlot _debuff in _deleteDebuffs)
+            {
+                buffUseComponent.UndoDebuff(_debuff);
+                ClearDebuff(_debuff);
+            }
+
+        }
+        public void AddBuff(BuffSlot _buffSlot)
+        {
+            Debug.Log("Got Buff - " + _buffSlot.buff.ToString());
+
+            bool _match = false; // check on match bool
+            BuffSlot _matchBuff = null; // if check - need to keep it
+
+            if (_buffSlot.buff.isBuff == true)
+            {
+                foreach (BuffSlot _buff in buffs)
+                {
+                    if (_buff.buff == _buffSlot.buff)
+                    {
+                        _match = true;
+                        _matchBuff = _buff;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                foreach (BuffSlot _debuff in debuffs)
+                {
+                    if (_debuff.buff == _buffSlot.buff)
+                    {
+                        _match = true;
+                        _matchBuff = _debuff;
+                        break;
+                    }
+                }
+            }
+
+
+            if (_match == true)
+            {
+               
+                if (_buffSlot.buff.stacking == true) 
+                { _matchBuff.stack += 1; } 
+                                                                                
+                _matchBuff.time = _buffSlot.time;
+            }
+            else if (_match == false)
+            {
+                if (_buffSlot.buff.isBuff == true)
+                {
+                    buffUseComponent.UseBuff(_buffSlot);
+                    buffs.Add(_buffSlot);
+                    if(uIBuffsPanelComponent) uIBuffsPanelComponent.UpdateUI();
+                }
+                if (_buffSlot.buff.isBuff == false)
+                {
+                    buffUseComponent.UseDebuff(_buffSlot);
+                    debuffs.Add(_buffSlot);
+                    if(uIDebuffsPanelComponent) uIDebuffsPanelComponent.UpdateUI();
+                }
+            }
+
+
+        }
+
+        public Buff GetBuff(int i) { return i < buffs.Count ? buffs[i].buff : null; }
+
+        public int GetBuffsSize() { return buffs.Count; }
+
+        public Buff GetDebuff(int i) { return i < debuffs.Count ? debuffs[i].buff : null; }
+
+        public int GetDebuffsSize() { return debuffs.Count; }
+    }
