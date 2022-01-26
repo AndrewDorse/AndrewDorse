@@ -1,0 +1,128 @@
+using System.Collections.Generic;
+using UnityEngine;
+
+public class BuffUse
+    {
+        public Character characterComponent;
+
+        public void UseBuff(BuffSlot _buffSlot)
+        {
+            if (_buffSlot.time == 0)
+            {
+                _buffSlot.time = _buffSlot.buff.duration;
+            }
+
+            if (_buffSlot.buff.type == BuffTypes.changing)
+            {
+                foreach (FeatureSlot _feature in _buffSlot.buff.features)
+                {
+                    characterComponent.ChangeAttribute(_feature.id + 200, _feature.value);
+                }
+                if (_buffSlot.level > 1)
+                {
+                    foreach (FeatureSlot _feature in _buffSlot.buff.levelFeatures)
+                    {
+                        characterComponent.ChangeAttribute(_feature.id + 200, _feature.value * (_buffSlot.level - 1));
+                    }
+
+                }
+            }
+            else if (_buffSlot.buff.type == BuffTypes.controlling)
+            {
+                if (_buffSlot.buff.controlSlot.controlType != ControlTypes.nothing)
+                {
+                    characterComponent.AddState(_buffSlot.buff.controlSlot);
+                }
+            }
+            
+
+            // universal stuff
+            if (_buffSlot.buff.blockDamageTimes > 0)
+            {
+                if (characterComponent.blockDamageSlots == null) characterComponent.blockDamageSlots = new List<BlockDamageSlot>();
+                characterComponent.blockDamageSlots.Add(new BlockDamageSlot(_buffSlot, _buffSlot.buff.blockDamageTimes));
+            }
+            if (_buffSlot.buff.absorbDamage > 0)
+            {
+                characterComponent.currentAbsorb += _buffSlot.buff.absorbDamage;
+                Debug.Log("currentAbsorb +" + _buffSlot.buff.absorbDamage);
+            }
+            if (_buffSlot.buff.superState != SuperStates.nothing)
+            {
+                characterComponent.superStateSlot = new SuperStateSlot(_buffSlot.buff.superState, _buffSlot.buff.duration);
+                characterComponent.StartSuperState(_buffSlot.buff.superState);
+            }
+
+        }
+        public void UndoBuff(BuffSlot _buffSlot)
+        {
+            if (_buffSlot.buff.type == BuffTypes.changing)
+            {
+                foreach (FeatureSlot _feature in _buffSlot.buff.features)
+                {
+                    characterComponent.ChangeAttribute(_feature.id + 200, -_feature.value);
+                }
+                if (_buffSlot.level > 1)
+                {
+                    foreach (FeatureSlot _feature in _buffSlot.buff.levelFeatures)
+                    {
+                        characterComponent.ChangeAttribute(_feature.id + 200, -_feature.value * (_buffSlot.level - 1));
+                    }
+                }
+            }
+
+            if (_buffSlot.buff.endDurationBuff)
+            {
+                BuffSlot _buffEndDuration = new BuffSlot(_buffSlot.buff.endDurationBuff, _buffSlot.level, (int)_buffSlot.buff.endDurationBuff.duration);
+                characterComponent.AddBuff(_buffEndDuration);
+            }           
+        }
+
+        public void UseDebuff(BuffSlot _buffSlot)
+        {
+            Debug.Log("Use Buff - " + _buffSlot.buff.ToString());
+
+            if (_buffSlot.buff.type == BuffTypes.changing)
+            {
+                foreach (FeatureSlot _feature in _buffSlot.buff.features)
+                {
+                    characterComponent.ChangeAttribute(_feature.id + 200, _feature.value);
+                }
+                if (_buffSlot.level > 1)
+                {
+                    foreach (FeatureSlot _feature in _buffSlot.buff.levelFeatures)
+                    {
+                        characterComponent.ChangeAttribute(_feature.id + 200, _feature.value * (_buffSlot.level - 1));
+                    }
+
+                }
+                
+            }
+            else if (_buffSlot.buff.type == BuffTypes.controlling)
+            {
+                if (_buffSlot.buff.controlSlot.controlType != ControlTypes.nothing)
+                {
+                    characterComponent.AddState(_buffSlot.buff.controlSlot);
+                }
+            }
+        }
+        public void UndoDebuff(BuffSlot _buffSlot)
+        {
+            if (_buffSlot.buff.type == BuffTypes.changing)
+            {
+                foreach (FeatureSlot _feature in _buffSlot.buff.features)
+                {
+                    characterComponent.ChangeAttribute(_feature.id + 200, -_feature.value);
+                }
+                if (_buffSlot.level > 1)
+                {
+                    foreach (FeatureSlot _feature in _buffSlot.buff.levelFeatures)
+                    {
+                        characterComponent.ChangeAttribute(_feature.id + 200, -_feature.value * (_buffSlot.level - 1));
+                    }
+
+                }
+            }
+        }
+
+    }
