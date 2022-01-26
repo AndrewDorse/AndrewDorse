@@ -1,0 +1,264 @@
+using System.Collections.Generic;
+using UnityEngine;
+using stats;
+
+namespace Photon.Pun.Darse.Tales
+{
+    public enum DamageTypes { physical, fire, ice, electro, nature, light, death}
+    public enum SpellTypes { buffMyself, projectiles, effectArea }
+    public enum PassiveTypes { statsChanging, triggerBuff }
+    public enum TriggerPassives { Nothing, Block, Evade, Parry, HitMelee, HitRange, MagicDamage, HP10, HP30, HP50, HP100, CriticalStrike }
+    public enum MainAttributes { strength, agility, intellegence }
+    public enum HeroTypeAttack { melee, range, both }
+    public enum ProjectileType { straightNoTarget, straightToTarget }
+    public enum AnimationTriggers { CastTaunt, CastShieldAttack, CastJumpAttack, CastSmallAreaSpell, CastSpellOneHand, CastHandToHeaven }
+    public enum BuffTypes { changing, damaging, healing, debuffInRadius, controlling };
+    public enum ControlTypes { nothing, stun, freeze, fear, knocked };
+    public enum SuperStates { nothing, invisible, invulnerable};
+    
+    public abstract class Character : MonoBehaviourPun
+    {
+        public bool player = false;
+        public float currentHP, currentMP, currentAbsorb, maximumHP, maximumMP;
+        public float[] rates;
+        public List<BlockDamageSlot> blockDamageSlots;
+        
+        #region Components
+        public Stats stats;
+        public BuffList buffListComponent;
+        public BuffUse buffUseComponent;
+        public PassiveUse passiveUseComponent;
+        public PassiveCheck passiveCheckComponent;
+        public SpellList spellListComponent;
+        public SpellCaster spellCasterComponent;
+        public ICombatUI combatUIInterface;
+        #endregion
+
+        #region Character metods
+        public virtual void Initialization() { }
+
+        public void NewRates()
+        {
+            rates[0] = Rates.NewStatsRate(Manager.level);
+            rates[1] = Rates.NewDefenseRate(Manager.level);
+            rates[2] = Rates.NewAttackSpeedRate(Manager.level);
+        }
+
+        public void DealDamage(DamageSlot _damageSlot)
+        {
+            if (stats == null) return;
+
+            if (player && blockDamageSlots != null)
+            {
+                if (blockDamageSlots.Count > 0)
+                {
+                    blockDamageSlots[0].currentBlocks--;
+                    if (blockDamageSlots[0].currentBlocks <= 0)
+                    {
+                        blockDamageSlots.Remove(blockDamageSlots[0]);
+                    }
+                    return;
+                }
+            }
+
+            if (_damageSlot.damageType == DamageTypes.physical)
+            {
+                bool _decreaseDamage = false;
+                float _defense = 1 - stats.stats_list[45];
+                float _currentDamage = _damageSlot.damage;
+
+                if (_defense < 0.2f) _defense = 0.2f;
+
+                // evade 0% 
+                int _random = Random.Range(0, 100);
+                if (rates[0] * stats.stats_list[43] >= _random && !_decreaseDamage) { _currentDamage = 0; passiveCheckComponent.CheckPassive(TriggerPassives.Evade); _decreaseDamage = true; }
+                // block 20%
+                _random = Random.Range(0, 100);
+                if (rates[0] * stats.stats_list[44] >= _random && !_decreaseDamage) { _currentDamage = (_defense * _damageSlot.damage) * 0.2f; passiveCheckComponent.CheckPassive(TriggerPassives.Block); _decreaseDamage = true; }
+                // parry 50%
+                _random = Random.Range(0, 100);
+                if (rates[0] * stats.stats_list[45] >= _random && !_decreaseDamage) { _currentDamage = (_defense * _damageSlot.damage) * 0.5f; passiveCheckComponent.CheckPassive(TriggerPassives.Parry); _decreaseDamage = true; }
+                // full damage 100%
+                if (!_decreaseDamage) { _currentDamage = _defense * _damageSlot.damage; passiveCheckComponent.CheckPassive(TriggerPassives.HitMelee); }
+
+                if (player == false)
+                {
+                    CreateBloodEffect();
+                    if (PhotonNetwork.IsMasterClient)
+                    {
+                        photonView.RPC("Damage", RpcTarget.Others, _currentDamage);
+                    }
+                    else
+                    {
+                        photonView.RPC("Damage", RpcTarget.Others, _currentDamage);
+                    }
+                    currentHP = currentHP - _currentDamage;
+                    if (currentHP <= 0) { Death(); }
+                    if (combatUIInterface != null)
+                    {
+                        combatUIInterface.CombatText((int)Mathf.Ceil(_currentDamage), _damageSlot.damageType);
+                        combatUIInterface.SetPercentageHP(currentHP / stats.stats_list[0], currentHP);
+                    }
+                    else Debug.LogError("combatUIInterface == null", this);                    
+                }
+                else
+                {
+                    CombatText(_currentDamage, _damageSlot.damageType);
+                    currentHP -= _currentDamage;
+                }
+            }
+        }
+
+        [PunRPC]
+        public void Damage(float _object)
+        {
+            CreateBloodEffect();
+            currentHP -= (float)_object;
+            if (PhotonNetwork.IsMasterClient)
+            { 
+                if (currentHP <= 0){ Death(); } 
+            }
+
+        }
+    }
+     
+    #region Slot Classes
+
+    public class PassiveSlot
+    {
+        public Passive passive;
+        public int level;
+        public int cooldown = 0;
+
+        public PassiveSlot(Passive passive, int level, int cooldown = 0)
+        {
+            this.passive = passive;
+            this.level = level;
+            this.cooldown = cooldown;
+
+        }
+    }
+    [System.Serializable]
+    public class FeatureSlot
+    {
+        public int id;
+        public float value;
+
+        public FeatureSlot(int id, float value)
+        {
+            this.id = id;
+            this.value = value;
+        }
+    }
+
+    [System.Serializable]
+    public class BuffSlot
+    {
+        public Buff buff;
+        public int level;
+        public float time;
+        public int stack;
+
+        public BuffSlot(Buff buff, int level, float time = 5, int stack = 0)
+        {
+            this.buff = buff;
+            this.level = level;
+            this.time = time;
+            this.stack = stack;
+        }
+    }
+
+    [System.Serializable]
+    public class ControlSlot
+    {
+        public ControlTypes controlType;
+        public float time;
+
+        public ControlSlot(ControlTypes controlType, float time = 1)
+        {
+            this.controlType = controlType;
+            this.time = time;            
+        }
+    }
+    public class SpellSlot
+    {
+        public Spell spell;
+        public int level = 1;
+
+        public SpellSlot(Spell spell, int level)
+        {
+            this.spell = spell;
+            this.level = level;
+        }
+    }
+    public class BlockDamageSlot
+    {
+        public BuffSlot buffSlot;
+        public int currentBlocks = 1;
+
+        public BlockDamageSlot(BuffSlot buffSlot, int currentBlocks)
+        {
+            this.buffSlot = buffSlot;
+            this.currentBlocks = currentBlocks;
+        }
+    }
+    public class DamageSlot
+    {
+        public int damage = 1;
+        public DamageTypes damageType = DamageTypes.physical;
+        public int mastery = 0;
+        public bool critical = false;
+        public GameObject owner = null;
+
+        public DamageSlot(int damage = 1, DamageTypes damageType = DamageTypes.physical, int mastery = 0, bool critical = false, GameObject owner = null)
+        {
+            this.damage = damage;
+            this.damageType = damageType;
+            this.mastery = mastery;
+            this.critical = critical;
+            this.owner = owner;
+
+        }
+    }
+    [System.Serializable]
+    public class EnemySlot
+    {
+        public Mob mob;
+        public int amount;
+
+        public EnemySlot (Mob mob, int amount)
+        {
+            this.mob = mob;
+            this.amount = amount;
+        }
+    }
+    public class SuperStateSlot
+    {
+        public SuperStates superState;
+        public float duration;
+
+        public SuperStateSlot(SuperStates superState, float duration)
+        {
+            this.superState = superState;
+            this.duration = duration;
+        }
+    }
+    public class Hero
+    {
+        public HeroClass heroClass;
+        public int level;
+        public float[] statsList;
+        public List<SpellSlot> spells;
+        public List<PassiveSlot> passives;
+
+        public Hero(HeroClass _heroClass = null, int _level = 1, float[] _statsList = null,
+                                          List<SpellSlot> _spells = null, List<PassiveSlot> _passives = null)
+        {
+            this.heroClass = _heroClass;
+            this.level = _level;
+            this.statsList = _statsList;
+            this.spells = _spells;
+            this.passives = _passives;
+        }
+    }
+    #endregion
