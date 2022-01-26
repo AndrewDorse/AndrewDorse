@@ -1,0 +1,270 @@
+using System.Collections.Generic;
+using UnityEngine;
+using Photon.Realtime;
+using ExitGames.Client.Photon;
+
+namespace Photon.Pun.Darse.Tales
+{
+    public class Pool : MonoBehaviourPun, IOnEventCallback
+    {
+        public static Pool current;
+
+        public List<List<GameObject>> pool;
+        public List<GameObject> types;
+        public List<Mob> mobs;
+
+        public List<List<GameObject>> projectilesPool;
+        public List<GameObject> projectileTypes;
+
+        public List<List<GameObject>> mobPool;
+        public List<GameObject> mobTypes;
+        
+        void Awake()
+        {
+            current = this;
+            pool = new List<List<GameObject>>();
+            types = new List<GameObject>();
+            mobs = new List<Mob>();
+            projectilesPool = new List<List<GameObject>>();
+            projectileTypes = new List<GameObject>();
+            mobPool = new List<List<GameObject>>();
+            mobTypes = new List<GameObject>();
+        }
+        
+        public GameObject GetPooledGameObject(GameObject _gameObject)
+        {
+            bool _exists = false;
+            int _number = 0;
+            for (int i = 0; i < types.Count; i++)
+            {
+                if (types[i] == _gameObject)
+                {
+                  
+                    _exists = true;
+                    _number = i;
+                    for (int ii = 0; ii < pool[i].Count; ii++)
+                    {
+                        if (!pool[i][ii].activeInHierarchy)
+                        {
+                            pool[i][ii].transform.SetParent(null);
+                            return pool[i][ii];
+                        }
+                    }
+                }
+            }
+
+            if (_exists)
+            {
+                GameObject _newObject = Instantiate(_gameObject);
+                pool[_number].Add(_newObject);
+                return _newObject;
+            }
+            else
+            {
+                GameObject _newObject = Instantiate(_gameObject);
+                types.Add(_gameObject);
+                pool.Add(new List<GameObject>());
+                pool[types.Count - 1].Add(_newObject);
+                return _newObject;
+            }
+        }
+
+        public void PoolInitialization(GameObject _gameObject)
+        {
+
+            if (_gameObject != null)
+            {
+                bool _match = false;
+                if (types.Count != 0)
+                {
+                    for (int i = 0; i < types.Count; i++)
+                    {
+                        if (types[i] == _gameObject)
+                        {
+                            _match = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (_match == false)
+                {
+                    types.Add(_gameObject);
+                    pool.Add(new List<GameObject>());
+                    for (int i = 0; i < 5; i++)
+                    {
+                        GameObject _newGameObjectForPool = Instantiate(_gameObject, Vector3.zero, Quaternion.identity);
+                        _newGameObjectForPool.SetActive(false);
+                        pool[types.Count - 1].Add(_newGameObjectForPool);
+                    }
+                }
+            }
+
+        }
+        
+        private void CreateEffect(string _name, Vector3 _pos)
+        {
+            for (int i = 0; i < types.Count; i++)
+            {
+                if (types[i].name.Contains(_name))
+                {
+                    GameObject _effect = GetPooledGameObject(types[i]);
+                    _effect.transform.position = _pos;
+                    _effect.SetActive(true);
+                }
+            }
+
+
+        }
+       
+        public void OnEvent(EventData photonEvent)
+        {
+            switch (photonEvent.Code)
+            {
+                case 0:                 
+                    GameObject _effect = Resources.Load<GameObject>((string)photonEvent.CustomData);
+                    PoolInitialization(_effect); 
+                    break;
+
+                case 1:
+                    object[] _data = photonEvent.CustomData as object[];
+                    Vector3 _pos = (Vector3)_data[1];
+                    string _name = (string)_data[0];
+                    CreateEffect(_name, _pos);
+                    break;
+            }
+        }
+        private void OnEnable()
+        {
+            PhotonNetwork.AddCallbackTarget(this);
+        }
+        private void OnDisable()
+        {
+            PhotonNetwork.RemoveCallbackTarget(this);
+        }
+
+        #region Mobs
+        public Mob GetMobScriptable(string _name)
+        {
+            for (int i = 0; i < mobs.Count; i++)
+            {
+                if (_name.Contains(mobs[i].mobName))
+                {
+                    return mobs[i];
+                }
+            }
+            return null;
+        }
+        public void PoolMobScriptableInitialization(Mob _mob)
+        {
+            bool _match = false;
+
+            if (mobs.Count != 0)
+            {
+                for (int i = 0; i < mobs.Count; i++)
+                {
+                    if (mobs[i] == _mob)
+                    {
+                        _match = true;
+                        break;
+                    }
+                }
+            }
+
+            if (_match == false)
+            {
+                mobs.Add(_mob);
+            }
+        }
+        public void PoolMobInitialization(GameObject _gameObject)
+        {
+            bool _match = false;
+            if (mobTypes.Count != 0)
+            {
+                for (int i = 0; i < mobTypes.Count; i++)
+                {
+                    if (mobTypes[i].name == _gameObject.name)
+                    {
+                        _match = true;
+                        mobPool[i].Add(_gameObject);
+                        break;
+                    }
+                }
+            }
+
+            if (_match == false)
+            {
+                mobTypes.Add(_gameObject);
+                mobPool.Add(new List<GameObject>());
+                _gameObject.SetActive(false);
+                mobPool[mobTypes.Count - 1].Add(_gameObject);
+            }
+        }
+        public GameObject GetPooledMob(string _name)
+        {
+            bool _exists = false;
+            int _number = 0;
+            for (int i = 0; i < mobTypes.Count; i++)
+            {
+                if (mobTypes[i].name == _name)
+                {
+                    _exists = true;
+                    _number = i;
+                    for (int ii = 0; ii < mobPool[i].Count; ii++)
+                    {
+                        if (!mobPool[i][ii].activeInHierarchy)
+                        {
+                            mobPool[i][ii].transform.SetParent(null);
+                            return mobPool[i][ii];
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        #endregion
+
+        #region Projectiles
+        public GameObject GetPooledProjectile(GameObject _gameObject)
+        {
+
+            bool _exists = false;
+            int _number = 0;
+            for (int i = 0; i < projectileTypes.Count; i++)
+            {
+                if (projectileTypes[i] == _gameObject)
+                {
+                    _exists = true;
+                    _number = i;
+                    for (int ii = 0; ii < projectilesPool[i].Count; ii++)
+                    {
+                        if (!projectilesPool[i][ii].activeInHierarchy)
+                        {
+                            projectilesPool[i][ii].transform.SetParent(null);
+                            return projectilesPool[i][ii];
+                        }
+                    }
+                }
+            }
+
+            if (_exists)
+            {
+                GameObject _newObject = PhotonNetwork.Instantiate(_gameObject.name, new Vector3(0, 100, 0), Quaternion.identity);
+                projectilesPool[_number].Add(_newObject);
+                return _newObject;
+            }
+            else
+            {
+                GameObject _newObject = PhotonNetwork.Instantiate(_gameObject.name, new Vector3(0, 100, 0), Quaternion.identity);
+                projectileTypes.Add(_gameObject);
+                projectilesPool.Add(new List<GameObject>());
+                projectilesPool[projectileTypes.Count - 1].Add(_newObject);
+                return _newObject;
+            }
+        }  
+        
+        #endregion
+    }
+}
