@@ -1,0 +1,75 @@
+public class SpellList
+    {
+        public SpellList() { }
+        
+        public List<SpellSlot> spells = new List<SpellSlot>();
+
+        public UISpellPanel uISpellPanelComponent;
+        public PlayerAnimatorManager stateMasterComponent;
+        public SpellCaster spellCasterComponent;
+        public float[] cooldowns;
+        
+        public void CastSpell(int _spellNumber, float _spellSpeedRate)
+        {
+            spellCasterComponent.SetSpell(spells[_spellNumber]);
+            cooldowns[_spellNumber] = spells[_spellNumber].spell.cooldown;
+
+            // get direction or point if need
+            if (spells[_spellNumber].spell.castTime > 0)
+            {
+                // state machine - start cast animation for castTime * % from speed spell rate
+                float _castTime = spells[_spellNumber].spell.castTime * (1 - _spellSpeedRate);
+
+                stateMasterComponent.Start_Cast(_castTime, spells[_spellNumber].spell.animatorTrigger.ToString());
+
+            }
+            else if (spells[_spellNumber].spell.castTime == 0)
+            {
+                stateMasterComponent.Finish_Cast(spells[_spellNumber].spell.animatorTrigger.ToString());
+            }
+        }
+
+        public void AimSpell(int _spellNumber)
+        {
+            if (spells.Count >= _spellNumber)
+            {
+                if (cooldowns[_spellNumber] <= 0)
+                {
+                    if (spells[_spellNumber].spell.showDirection)
+                    {
+                        stateMasterComponent.ShowDirection(spells[_spellNumber].spell.range);
+                    }
+                    else if (spells[_spellNumber].spell.showPointer)
+                    {
+                        stateMasterComponent.ShowDirection(spells[_spellNumber].spell.radius);
+                    }
+                }
+            }
+        }
+
+        public void AddSpell(Spell _spell)
+        {  
+            SpellSlot _spellSlot = new SpellSlot(_spell, 1);
+
+            foreach (SpellSlot _slot in spells)
+            {
+                if (_slot.spell.id == _spell.id)
+                {
+                    _slot.level += 1; 
+                }
+            }
+            if (spells.Count < 10)
+            {
+                spells.Add(_spellSlot);
+                uISpellPanelComponent.UpdateUI();
+                Realtime.RaiseEventOptions _options = new Realtime.RaiseEventOptions { CachingOption = Realtime.EventCaching.DoNotCache, Receivers = Realtime.ReceiverGroup.All };
+
+                PhotonNetwork.RaiseEvent(0, _spellSlot.spell.effectPath, _options, ExitGames.Client.Photon.SendOptions.SendReliable);
+            }
+        }
+
+        public Spell GetItem(int _number) { return _number < spells.Count ? spells[_number].spell : null; }
+
+        public int GetSize() { return spells.Count; }
+
+    }
